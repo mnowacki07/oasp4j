@@ -8,6 +8,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import io.oasp.gastronomy.restaurant.general.common.api.datatype.Money;
 import io.oasp.gastronomy.restaurant.general.dataaccess.api.ApplicationPersistenceEntity;
 
@@ -17,7 +20,7 @@ import io.oasp.gastronomy.restaurant.general.dataaccess.api.ApplicationPersisten
  */
 @Entity
 @Table(name = "Special")
-public class SpecialEntity extends ApplicationPersistenceEntity {
+public class SpecialEntity extends ApplicationPersistenceEntity implements Special {
 
   private String name;
 
@@ -48,6 +51,7 @@ public class SpecialEntity extends ApplicationPersistenceEntity {
    * @return offer
    */
   @ManyToOne(fetch = FetchType.EAGER)
+  @NotFound(action = NotFoundAction.IGNORE)
   @JoinColumn(name = "offerId")
   public OfferEntity getOffer() {
 
