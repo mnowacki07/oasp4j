@@ -3,18 +3,26 @@ package io.oasp.gastronomy.restaurant.offermanagement.logic.impl;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import io.oasp.gastronomy.restaurant.offermanagement.dataaccess.api.OfferEntity;
+import io.oasp.gastronomy.restaurant.offermanagement.dataaccess.api.SpecialEntity;
 import io.oasp.gastronomy.restaurant.offermanagement.dataaccess.api.dao.OfferDao;
+import io.oasp.gastronomy.restaurant.offermanagement.dataaccess.api.dao.SpecialDao;
 import io.oasp.gastronomy.restaurant.offermanagement.logic.api.to.OfferCto;
 import io.oasp.gastronomy.restaurant.offermanagement.logic.api.to.OfferEto;
+import io.oasp.gastronomy.restaurant.offermanagement.logic.api.to.SpecialEto;
+import io.oasp.gastronomy.restaurant.offermanagement.logic.api.to.SpecialSearchCriteriaTo;
 import io.oasp.module.beanmapping.common.api.BeanMapper;
 import io.oasp.module.test.common.base.ModuleTest;
 
@@ -38,6 +46,9 @@ public class OffermanagementImplTest extends ModuleTest {
   public MockitoRule rule = MockitoJUnit.rule();
 
   @Mock
+  private SpecialDao specialDao;
+
+  @Mock
   private OfferDao offerDao;
 
   @Mock
@@ -52,6 +63,7 @@ public class OffermanagementImplTest extends ModuleTest {
   public void init() {
 
     this.offerManagementImpl = new OffermanagementImpl();
+    this.offerManagementImpl.setSpecialDao(this.specialDao);
     this.offerManagementImpl.setOfferDao(this.offerDao);
     this.offerManagementImpl.setBeanMapper(this.beanMapper);
   }
@@ -111,6 +123,75 @@ public class OffermanagementImplTest extends ModuleTest {
     assertThat(responseOfferCto).isNotNull();
     assertThat(responseOfferCto.getOffer()).isEqualTo(offerEto);
 
+  }
+
+  @Test
+  public void shouldFindSpecials() {
+
+    SpecialEntity special = new SpecialEntity();
+    SpecialSearchCriteriaTo searchCriteria = new SpecialSearchCriteriaTo();
+    SpecialEto specialEto = new SpecialEto();
+
+    List<SpecialEntity> specials = Collections.singletonList(special);
+    when(this.specialDao.findActiveSpecials(searchCriteria)).thenReturn(specials);
+
+    List<SpecialEto> specialEtos = Collections.singletonList(specialEto);
+    when(this.beanMapper.mapList(specials, SpecialEto.class)).thenReturn(specialEtos);
+
+    List<SpecialEto> activeSpecials = this.offerManagementImpl.getActiveSpecials(searchCriteria);
+
+    assertThat(activeSpecials).isNotNull();
+    assertThat(activeSpecials.get(0)).isEqualTo(specialEto);
+
+  }
+
+  @Test
+  public void findSpecial() {
+
+    // given
+    SpecialEntity specialEntity = mock(SpecialEntity.class);
+    SpecialEto specialEto = new SpecialEto();
+
+    when(this.specialDao.findOne(ID)).thenReturn(specialEntity);
+    when(this.beanMapper.map(specialEntity, SpecialEto.class)).thenReturn(specialEto);
+
+    // when
+    SpecialEto responseOfferEto = this.offerManagementImpl.findSpecial(ID);
+
+    // then
+    assertThat(responseOfferEto).isNotNull();
+    assertThat(responseOfferEto).isEqualTo(specialEto);
+
+  }
+
+  @Test
+  public void shouldSaveSpecial() {
+
+    SpecialEto specialEto = new SpecialEto();
+    SpecialEntity special = new SpecialEntity();
+
+    when(this.beanMapper.map(special, SpecialEto.class)).thenReturn(specialEto);
+    when(this.beanMapper.map(specialEto, SpecialEntity.class)).thenReturn(special);
+    when(this.specialDao.save(special)).thenReturn(special);
+
+    SpecialEto savedSpecial = this.offerManagementImpl.saveSpecial(specialEto);
+
+    assertThat(savedSpecial).isEqualTo(specialEto);
+
+  }
+
+  @Test
+  public void deleteSpecial() {
+
+    this.offerManagementImpl.deleteSpecial(ID);
+
+    Mockito.verify(this.specialDao).delete(ID);
+
+  }
+
+  public static <T extends List<?>> T cast(Object obj) {
+
+    return (T) obj;
   }
 
 }
