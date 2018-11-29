@@ -16,7 +16,9 @@ CREATE TABLE StaffMember(
   role INTEGER,
   CONSTRAINT PK_StaffMember PRIMARY KEY(id),
   CONSTRAINT UC_StaffMember_login UNIQUE(login)
-);
+); 
+
+--INSERT INTO StaffMember (id, modificationCounter, firstname, lastname, login, role) VALUES (1,2,"JJ","KK",5);
 
 -- *** Product ***
 CREATE TABLE Product(
@@ -148,4 +150,25 @@ CREATE TABLE Special(
     CONSTRAINT FK_SpecialOffer_offerId FOREIGN KEY(offerId) REFERENCES Offer(id) NOCHECK,
     CONSTRAINT PK_Special PRIMARY KEY(id),
     CONSTRAINT UC_Special_name UNIQUE(name)
+); 
+
+CREATE TABLE Supplier(
+    id BIGINT NOT NULL,
+    modificationCounter INTEGER NOT NULL,
+    name VARCHAR(255),
+    description VARCHAR(255),
+    rate INTEGER,
+    CONSTRAINT PK_Supplier PRIMARY KEY(id),
+    CONSTRAINT UC_Supplier_name UNIQUE(name)
 );
+
+--
+
+INSERT INTO Supplier (id, modificationCounter, name, description, rate) VALUES (1, 0, 'Natural Fruit Exports', 'Fruit', 4);
+
+INSERT INTO Supplier (id, modificationCounter, name, description, rate) VALUES (2, 0, 'CPS Gourmet', 'Meat', 5);
+
+INSERT INTO Supplier (id, modificationCounter, name, description, rate) VALUES (3, 0, 'Albafrost', 'Vegetables', 3); 
+
+
+
